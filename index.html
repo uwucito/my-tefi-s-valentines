@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Proposal</title>
+    <style>
+        body {
+            background-color: #FFE4E1;
+            font-family: 'Edwardian Script ITC', cursive, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #proposal-container {
+            text-align: center;
+            transition: opacity 0.5s ease;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Photo containers on both sides */
+        .photo-container {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 200px;
+            height: 200px;
+            border: 5px solid #FF69B4;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(255, 105, 180, 0.4);
+            z-index: 5;
+        }
+
+        #photo-left {
+            left: 50px;
+        }
+
+        #photo-right {
+            right: 50px;
+        }
+
+        .photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Heart decorations */
+        .heart {
+            position: absolute;
+            color: #FF69B4;
+            font-size: 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        #heart1 {
+            top: 20%;
+            left: 15%;
+            animation-delay: 0s;
+        }
+
+        #heart2 {
+            top: 20%;
+            right: 15%;
+            animation-delay: 1s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            color: #FF69B4;
+            font-size: 4rem; /* Significant increase from 2rem */
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(255, 105, 180, 0.3); /* Subtle glow */
+            padding: 0 20px; /* Prevents text from hitting edges on mobile */
+            line-height: 1.2;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: 4px ridge;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+
+        #yesBtn {
+            background-color: #98FB98;
+            color: white;
+            font-size: 16px;
+        }
+
+        #noBtn {
+            background-color: #FF6B6B;
+            color: white;
+            font-size: 16px;
+        }
+
+        /* Korean text below buttons */
+        #korean-text {
+            margin-top: 20px;
+            color: #FF1493;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(255, 105, 180, 0.3);
+            font-family: 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+        }
+
+        #canvas-container {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 50vh;
+        }
+
+        #flower-message {
+            color: #FFA216;
+            font-size: 1.5rem;
+            margin-top: 20px;
+            font-family: 'Candara', sans-serif;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 2s ease-in;
+        }
+
+        #flower-message.show {
+            opacity: 1;
+        }
+
+        /* Photo below the flower */
+        #final-photo-container {
+            margin-top: 30px;
+            opacity: 0;
+            transition: opacity 2s ease-in;
+            border: 5px solid #FFA216;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(255, 162, 22, 0.5);
+            max-width: 400px;
+            max-height: 400px;
+        }
+
+        #final-photo-container.show {
+            opacity: 1;
+        }
+
+        #final-photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Song link container */
+        #song-link-container {
+            margin-top: 30px;
+            margin-bottom: 30px;
+            opacity: 0;
+            transition: opacity 2s ease-in;
+            text-align: center;
+        }
+
+        #song-link-container.show {
+            opacity: 1;
+        }
+
+        #song-link {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #FF69B4, #FF1493);
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 50px;
+            box-shadow: 0 8px 20px rgba(255, 105, 180, 0.5);
+            transition: all 0.3s ease;
+            font-family: 'Candara', sans-serif;
+            border: 3px solid #FFA216;
+        }
+
+        #song-link:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 30px rgba(255, 105, 180, 0.8);
+            background: linear-gradient(135deg, #FF1493, #FF69B4);
+        }
+
+        #song-link:active {
+            transform: scale(1.05);
+        }
+
+        /* Musical note animation */
+        .music-note {
+            display: inline-block;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Hide photos on mobile for better view */
+        @media (max-width: 768px) {
+            .photo-container {
+                width: 120px;
+                height: 120px;
+            }
+            #photo-left {
+                left: 10px;
+            }
+            #photo-right {
+                right: 10px;
+            }
+            #final-photo-container {
+                max-width: 250px;
+                max-height: 250px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            #korean-text {
+                font-size: 1rem;
+            }
+            #song-link {
+                font-size: 1.2rem;
+                padding: 12px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Photos on both sides -->
+    <div class="photo-container" id="photo-left">
+        <img src="photo1.jpg" alt="Us">
+    </div>
+    
+    <div class="photo-container" id="photo-right">
+        <img src="photo2.jpg" alt="Us">
+    </div>
+
+    <!-- Floating hearts -->
+    <div class="heart" id="heart1">♥</div>
+    <div class="heart" id="heart2">♥</div>
+
+    <div id="proposal-container">
+        <h1>¿Serías mi san valentín? Tefi</h1>
+        <div class="buttons">
+            <button id="yesBtn" onclick="startAnimation()">YES</button>
+            <button id="noBtn" onclick="growYes()">NO</button>
+        </div>
+        <!-- Korean text below buttons -->
+        <div id="korean-text">난 정국은 아니지만, 널 사랑해</div>
+    </div>
+
+    <div id="canvas-container">
+        <canvas id="sunflowerCanvas"></canvas>
+        <div id="flower-message">Lo eres todo para mi, mi tefita ♡ 내 혈관 속 DNA가 말해줘 내가 찾아 헤매던 너라는 걸</div>
+        
+        <!-- Photo below the flower (appears at the end) -->
+        <div id="final-photo-container">
+            <img src="photo3.jpg" alt="Us Together Forever">
+        </div>
+
+        <!-- Song link -->
+        <div id="song-link-container">
+            <a href="https://www.youtube.com/watch?v=Rx6D5FN1pvg" target="_blank" id="song-link">
+                <span class="music-note">♪</span> Te la dedico <span class="music-note">♫</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let yesSize = 16;
+
+        function growYes() {
+            yesSize *= 1.5;
+            const yesBtn = document.getElementById('yesBtn');
+            yesBtn.style.fontSize = yesSize + 'px';
+            yesBtn.style.padding = (yesSize / 2) + 'px ' + yesSize + 'px';
+            
+            if (yesSize > 500) {
+                yesBtn.style.position = 'fixed';
+                yesBtn.style.top = '0';
+                yesBtn.style.left = '0';
+                yesBtn.style.width = '100vw';
+                yesBtn.style.height = '100vh';
+            }
+        }
+
+        function startAnimation() {
+            // Hide photos during animation
+            document.getElementById('photo-left').style.display = 'none';
+            document.getElementById('photo-right').style.display = 'none';
+            document.querySelectorAll('.heart').forEach(h => h.style.display = 'none');
+            
+            alert("¡Síii, grrrr!, mi hermosa uvita c: ñammmmm\n\nMe acabas de hacer el chico más feliz del mundo! ❤️\n\nAhora una sorpresa para ti 🌻\n♡ Para la chica más hermosa de todo el universo, para ti, mi tefita! ♡");
+            
+            document.getElementById('proposal-container').style.display = 'none';
+            document.getElementById('canvas-container').style.display = 'flex';
+            
+            drawSunflowerAnimated();
+        }
+
+        function drawSunflowerAnimated() {
+            const canvas = document.getElementById('sunflowerCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 600;
+            canvas.height = 600;
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2 - 40;
+
+            const animationDuration = 20000;
+            const startTime = Date.now();
+
+            const stages = {
+                petals: { start: 0, duration: 12000 },
+                seeds: { start: 12000, duration: 6000 },
+                text: { start: 18000, duration: 2000 }
+            };
+
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / animationDuration, 1);
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                if (elapsed >= stages.petals.start) {
+                    const petalProgress = Math.min((elapsed - stages.petals.start) / stages.petals.duration, 1);
+                    const totalPetals = 16;
+                    const petalsToShow = Math.floor(petalProgress * totalPetals);
+                    const currentPetalProgress = (petalProgress * totalPetals) % 1;
+
+                    ctx.strokeStyle = '#FFA216';
+                    ctx.lineWidth = 2;
+
+                    for (let i = 0; i < petalsToShow; i++) {
+                        drawPetal(ctx, centerX, centerY, i, 1);
+                    }
+
+                    if (petalsToShow < totalPetals) {
+                        drawPetal(ctx, centerX, centerY, petalsToShow, currentPetalProgress);
+                    }
+                }
+
+                if (elapsed >= stages.seeds.start) {
+                    const seedProgress = Math.min((elapsed - stages.seeds.start) / stages.seeds.duration, 1);
+                    const totalSeeds = 140;
+                    const seedsToShow = Math.floor(seedProgress * totalSeeds);
+
+                    const golden_ang = 137.508 * (Math.PI / 180);
+                    
+                    for (let i = 0; i < seedsToShow; i++) {
+                        let r = 4 * Math.sqrt(i);
+                        let theta = i * golden_ang;
+                        let x = centerX + r * Math.cos(theta);
+                        let y = centerY + r * Math.sin(theta);
+
+                        ctx.fillStyle = '#8B4513';
+                        ctx.beginPath();
+                        ctx.arc(x, y, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                if (elapsed >= stages.text.start) {
+                    const textProgress = Math.min((elapsed - stages.text.start) / stages.text.duration, 1);
+                    
+                    const t_pos = [[-27, 10], [-21, 10], [-15, 10], [-9, 10], [-3, 10], [-15, 16], [-15, 22], [-15, 28], [-15, 34], [-15, 40]];
+                    const u_pos = [[7, 10], [7, 16], [7, 22], [7, 28], [7, 34], [10, 37], [13, 40], [19, 41], [25, 40], [28, 37], [31, 34], [31, 28], [31, 22], [31, 16], [31, 10], [19, 4], [23, 0]];
+                    
+                    const allPoints = [...t_pos, ...u_pos];
+                    const pointsToShow = Math.floor(textProgress * allPoints.length);
+
+                    for (let i = 0; i < pointsToShow; i++) {
+                        const p = allPoints[i];
+                        ctx.fillStyle = '#FFA216';
+                        ctx.strokeStyle = 'black';
+                        ctx.beginPath();
+                        ctx.arc(centerX + p[0], centerY + p[1], 4, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                    }
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    // Show message and photo after animation completes
+                    document.getElementById('flower-message').classList.add('show');
+                    
+                    // Show the final photo after 1 second delay
+                    setTimeout(() => {
+                        document.getElementById('final-photo-container').classList.add('show');
+                    }, 1000);
+
+                    // Show the song link after 2 seconds delay
+                    setTimeout(() => {
+                        document.getElementById('song-link-container').classList.add('show');
+                    }, 2000);
+                }
+            }
+
+            function drawPetal(ctx, centerX, centerY, petalIndex, progress) {
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate((petalIndex * 22.5) * Math.PI / 180);
+                
+                const totalLayers = 18;
+                const layersToShow = Math.floor(progress * totalLayers);
+                
+                for (let j = 0; j < layersToShow; j++) {
+                    ctx.beginPath();
+                    let size = 150 - j * 6;
+                    ctx.ellipse(0, -size/2, size/4, size/2, 0, 0, 2 * Math.PI);
+                    ctx.stroke();
+                }
+                
+                ctx.restore();
+            }
+
+            animate();
+        }
+    </script>
+</body>
+</html>
